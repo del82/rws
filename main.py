@@ -25,6 +25,17 @@ class Article(ndb.Model):
 
 class MainHandler(webapp2.RequestHandler):
 
+    def safe_random_page(self):
+        page_list = wikipedia.random(10)
+        for title in page_list:
+            try:
+                article = wikipedia.page(title)
+                return article
+            except wikipedia.exceptions.DisambiguationError:
+                pass
+        # if that doesn't work, barf.  In the future grab a cached page?
+        raise wikipedia.exceptions.DisambiguationError(None, None)
+
     def get(self):
         article = wikipedia.page(wikipedia.random(1))
         local = Article(title         = article.title,
