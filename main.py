@@ -47,7 +47,9 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         #self.response.write(article.summary)  # this exists.
         random_sentence = random.choice([ i for i in local.sentence_list if not '==' in i])
-        self.response.write(template.render({'sentence' : random_sentence}))
+        self.response.write(template.render({'sentence' : random_sentence,
+                                             'title' : article.title,
+                                             'revision_id' : article.revision_id}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
