@@ -7,6 +7,9 @@ import wikipedia
 import nltk.data
 import jinja2
 import logging
+logger = logging.getLogger(__name__)
+from itertools import takewhile
+
 from google.appengine.ext import ndb
 
 tokenizer = nltk.data.load('./english.pickle')
@@ -40,17 +43,23 @@ class MainHandler(webapp2.RequestHandler):
         # if that doesn't work, barf.  In the future grab a cached page?
         raise wikipedia.exceptions.WikipediaException('too many disambiguation errors')
 
+    def _smart_tokenize(self, text):
+
+        sentences = tokenizer.tokenize(text)
+        pred = lambda x: x != '== References =='
+        return [s for s in list(takewhile(pred, sentences)) if not '==' in s]
+
     def get(self):
         article = self._safe_random_page()
         local = Article(title         = article.title,
                         content       = article.content,
                         revision_id   = article.revision_id,
-                        sentence_list = tokenizer.tokenize(article.content))
+                        sentence_list = self._smart_tokenize(article.content))
         local_key = local.put()
         #local = Article.query(Article.title == "Scott Colley").fetch(1)[0]
         template = JINJA_ENVIRONMENT.get_template('index.html')
         #self.response.write(article.summary)  # this exists.
-        random_sentence = random.choice([ i for i in local.sentence_list if not '==' in i])
+        random_sentence = random.choice(local.sentence_list)
         self.response.write(template.render({'sentence' : random_sentence,
                                              'title' : article.title,
                                              'revision_id' : article.revision_id}))
