@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 
+import os
 import random
 import webapp2
 import wikipedia
 import nltk.data
-#import jinja2
+import jinja2
 from google.appengine.ext import ndb
 
 tokenizer = nltk.data.load('./english.pickle')
+
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 class Article(ndb.Model):
     """ an article """
@@ -25,8 +32,11 @@ class MainHandler(webapp2.RequestHandler):
                         revision_id   = article.revision_id,
                         sentence_list = tokenizer.tokenize(article.content))
         local_key = local.put()
+        #local = Article.query(Article.title == "Scott Colley").fetch(1)[0]
+        template = JINJA_ENVIRONMENT.get_template('index.html')
         #self.response.write(article.summary)  # this exists.
-        self.response.write('<p>%s</p>' % random.choice([ i for i in local.sentence_list if not i.startswith('=')]))
+        random_sentence = random.choice([ i for i in local.sentence_list if not '==' in i])
+        self.response.write(template.render({'sentence' : random_sentence}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)

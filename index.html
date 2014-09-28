@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      p.lead {
+          font-size: 200%;
+      }
+    </style>
+    <title> A random sentence from Wikipedia </title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="pagination-centered" style="padding: 10%">
+        <p class="lead" style="font-size=120%">{{sentence}}</p>
+      </div>
+    </div>
+  </body>
+</html>
+{% endautoescape %}
