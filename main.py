@@ -6,6 +6,7 @@ import webapp2
 import wikipedia
 import nltk.data
 import jinja2
+import logging
 from google.appengine.ext import ndb
 
 tokenizer = nltk.data.load('./english.pickle')
@@ -25,19 +26,22 @@ class Article(ndb.Model):
 
 class MainHandler(webapp2.RequestHandler):
 
-    def safe_random_page(self):
+    def _safe_random_page(self):
+        logging.debug('Getting a safe random page')
         page_list = wikipedia.random(10)
         for title in page_list:
             try:
+                logging.debug('Trying %s' % title)
                 article = wikipedia.page(title)
                 return article
             except wikipedia.exceptions.DisambiguationError:
-                pass
+                logging.info('Caught DisambiguationError')
+                continue
         # if that doesn't work, barf.  In the future grab a cached page?
-        raise wikipedia.exceptions.DisambiguationError(None, None)
+        raise wikipedia.exceptions.WikipediaException('too many disambiguation errors')
 
     def get(self):
-        article = wikipedia.page(wikipedia.random(1))
+        article = self._safe_random_page()
         local = Article(title         = article.title,
                         content       = article.content,
                         revision_id   = article.revision_id,
