@@ -1,5 +1,5 @@
 application: random-wikipedia-sentence
-version: 1
+version: 1.1
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -17,3 +17,10 @@ libraries:
   version: "2.5.2"
 - name: jinja2
   version: latest
+
+error_handlers:
+  - error_code: over_quota
+    file: 503.html
+
+  - error_code: timeout
+    file: 500.html

@@ -29,6 +29,12 @@ class Article(ndb.Model):
     access_count = ndb.IntegerProperty(indexed = True, default = 0)
     loaded = ndb.DateTimeProperty(indexed = True, auto_now_add=True)
 
+def _smart_tokenize(text):
+
+    sentences = tokenizer.tokenize(text)
+    pred = lambda x: x != '== References =='
+    return [s for s in list(takewhile(pred, sentences)) if not '==' in s]
+
 class MainHandler(webapp2.RequestHandler):
 
     def _safe_random_page(self):
@@ -45,18 +51,15 @@ class MainHandler(webapp2.RequestHandler):
         # if that doesn't work, barf.  In the future grab a cached page?
         raise wikipedia.exceptions.WikipediaException('too many disambiguation errors')
 
-    def _smart_tokenize(self, text):
-
-        sentences = tokenizer.tokenize(text)
-        pred = lambda x: x != '== References =='
-        return [s for s in list(takewhile(pred, sentences)) if not '==' in s]
 
     def get(self):
+        #self.error(500)
+        #return None
         article = self._safe_random_page()
         local = Article(title         = article.title,
                         content       = article.content,
                         revision_id   = article.revision_id,
-                        sentence_list = self._smart_tokenize(article.content))
+                        sentence_list = _smart_tokenize(article.content))
         local_key = local.put()
         #local = Article.query(Article.title == "Scott Colley").fetch(1)[0]
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -73,6 +76,10 @@ class Wikipedia(object):
         pass
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
 
 ], debug=True)
+
+app.error_handlers[404] = lambda x, response, z: response.write(open('static/404.html').read())
+app.error_handlers[500] = lambda x, response, z: response.write(open('static/500.html').read())
+app.error_handlers[503] = lambda x, response, z: response.write(open('static/503.html').read())
