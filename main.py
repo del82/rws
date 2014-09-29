@@ -80,6 +80,10 @@ app = webapp2.WSGIApplication([
 
 ], debug=True)
 
-app.error_handlers[404] = lambda x, response, z: response.write(open('static/404.html').read())
-app.error_handlers[500] = lambda x, response, z: response.write(open('static/500.html').read())
-app.error_handlers[503] = lambda x, response, z: response.write(open('static/503.html').read())
+def error_404(request, response, error):
+    response.set_status(404)
+    response.write(open('static/404.html').read())
+
+app.error_handlers[404] = error_404
+#app.error_handlers[500] = lambda x, response, z: response.write(open('static/500.html').read())
+#app.error_handlers[503] = lambda x, response, z: response.write(open('static/503.html').read())
