@@ -26,6 +26,8 @@ class Article(ndb.Model):
     content = ndb.JsonProperty(compressed=True, indexed=False)
     sentence_list = ndb.JsonProperty(compressed=True, indexed=False)
     revision_id = ndb.IntegerProperty(indexed = False)
+    access_count = ndb.IntegerProperty(indexed = True, default = 0)
+    loaded = ndb.DateTimeProperty(indexed = True, auto_now_add=True)
 
 class MainHandler(webapp2.RequestHandler):
 
@@ -64,6 +66,13 @@ class MainHandler(webapp2.RequestHandler):
                                              'title' : article.title,
                                              'revision_id' : article.revision_id}))
 
+class Wikipedia(object):
+    """ smart, cached access to wikipedia articles"""
+
+    def __init__(self):
+        pass
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
+
 ], debug=True)
