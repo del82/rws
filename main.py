@@ -29,47 +29,16 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
 
-    def _safe_random_page(self):
-        logger.debug('Getting a safe random page')
-        page_list = wikipedia.random(10)
-        for title in page_list:
-            try:
-                logger.debug('Trying %s' % title)
-                article = wikipedia.page(title)
-                return article
-            except wikipedia.exceptions.DisambiguationError:
-                logger.info('Caught DisambiguationError')
-                continue
-        # if that doesn't work, barf.  In the future grab a cached page?
-        raise wikipedia.exceptions.WikipediaException('too many disambiguation errors')
-
-
     def get(self):
-        article = self._safe_random_page()
-        local = sentence.Article(title         = unicode(article.title),
-                                 content       = article.content,
-                                 revision_id   = article.revision_id,
-                                 sentence_list = sentence._smart_tokenize(article.content))
-        local_key = local.put()
+        random_sentence = sentence.random_sentence()
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        #self.response.write(article.summary)  # this exists.
-        random_sentence = random.choice(local.sentence_list)
-        self.response.write(template.render({'sentence' : unicode(random_sentence),
-                                             'title' : unicode(article.title),
-                                             'revision_id' : article.revision_id}))
+        self.response.write(template.render(random_sentence))
 
 
 class JSONHandler(MainHandler):
     def get(self):
-        article = self._safe_random_page()
-        local = sentence.Article(title         = unicode(article.title),
-                                 content       = article.content,
-                                 revision_id   = article.revision_id,
-                                 sentence_list = sentence._smart_tokenize(article.content))
-        local_key = local.put()
-        random_sentence = random.choice(local.sentence_list)
-        response = {'sentence' : random_sentence,
-                    'link' : 'https://en.wikipedia.org/wiki/%s' % unicode(local.title)}
+        random_sentence = sentence.random_sentence()
+        random_sentence['source'] =  'https://en.wikipedia.org/wiki/%s' % random_sentence['title']
         self.response.content_type = 'text/json'
         self.response.write(json.dumps(response))
 
