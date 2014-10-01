@@ -1,5 +1,5 @@
 application: random-wikipedia-sentence
-version: 5
+version: 5-error-pages
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -13,12 +13,17 @@ handlers:
   script: main.app
   login: admin
 
+- url: /del82_admin/500
+  script: main.app
+  login: admin
+
 - url: /del82_admin/.*
   script: google.appengine.ext.admin.application
   login: admin
 
 - url: .*
   script: main.app
+
 
 libraries:
 - name: webapp2
@@ -27,10 +32,20 @@ libraries:
   version: latest
 
 error_handlers:
-  - file: static/500.html
+  - file: static/500.2.html
 
   - error_code: over_quota
-    file: static/503.html
+    file: static/503.2.html
 
   - error_code: timeout
-    file: static/500.html
+    file: static/500.2.html
+
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- notes-on-app-engine\.org
+- load-test\.py
+- regenerate_error_pages\.py

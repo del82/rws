@@ -53,10 +53,15 @@ class AdminHandler(webapp2.RequestHandler):
         self.response.write(json.dumps(stats, ensure_ascii = False, indent = 2))
 
 
+class FHHandler(webapp2.RequestHandler):
+    def get(self):
+        assert False
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/api', JSONHandler),
-    ('/del82_admin', AdminHandler)
+    ('/del82_admin', AdminHandler),
+    ('/del82_admin/500', FHHandler)
 
 ], debug=False)
 
