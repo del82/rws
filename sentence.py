@@ -51,6 +51,7 @@ def _get_random_article():
                         revision_id   = article.revision_id,
                         sentence_list = sentence_list)
         if len(sentence_list) > 5:  # save only long articles
+            #random.shuffle(sentence_list) # pop off the front?
             local_key = local.put()
         return local
     except wikipedia.exceptions.DisambiguationError:
