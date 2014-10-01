@@ -35,16 +35,28 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(template.render(random_sentence))
 
 
-class JSONHandler(MainHandler):
+class JSONHandler(webapp2.RequestHandler):
     def get(self):
         random_sentence = sentence.random_sentence()
         random_sentence['source'] =  'https://en.wikipedia.org/wiki/%s' % random_sentence['title']
         self.response.content_type = 'text/json'
         self.response.write(json.dumps(response))
 
+
+class AdminHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.content_type = 'text/plain'
+        stats = {'total in datastore' : sentence.Article.query().count(),
+                 'total >1 access'    : sentence.Article.query(sentence.Article.access_count > 1).count(),
+        }
+
+        self.response.write(json.dumps(stats, ensure_ascii = False, indent = 2))
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/api', JSONHandler)
+    ('/api', JSONHandler),
+    ('/del82_admin', AdminHandler)
 
 ], debug=True)
 
