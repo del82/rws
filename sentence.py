@@ -81,6 +81,6 @@ def random_sentence():
     article = random_article()
     random_sentence = random.choice(article.sentence_list)
 
-    return {'sentence' : random_sentence,
+    return {'sentence' : unicode(random_sentence),
             'title'    : unicode(article.title),
             'revision_id' : article.revision_id }

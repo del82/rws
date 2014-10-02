@@ -40,7 +40,7 @@ class JSONHandler(webapp2.RequestHandler):
         random_sentence = sentence.random_sentence()
         random_sentence['source'] =  'https://en.wikipedia.org/wiki/%s' % random_sentence['title']
         self.response.content_type = 'text/json'
-        self.response.write(json.dumps(response))
+        self.response.write(json.dumps(random_sentence))
 
 
 class AdminHandler(webapp2.RequestHandler):
