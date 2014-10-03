@@ -9,16 +9,16 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /del82_admin/console/.*
+  script: google.appengine.ext.admin.application
+  login: admin
+
+- url: /del82_admin/error/.*
+  script: main.app
+  login: admin
+
 - url: /del82_admin
   script: main.app
-  login: admin
-
-- url: /del82_admin/500
-  script: main.app
-  login: admin
-
-- url: /del82_admin/.*
-  script: google.appengine.ext.admin.application
   login: admin
 
 - url: .*
